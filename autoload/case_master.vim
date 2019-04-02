@@ -5,16 +5,14 @@ if !exists('g:loaded_case_master')
 endif
 let g:loaded_case_master = 1
 
-let s:case_master_varbose = get(g:, 'case_master_varbose')
+let g:case_master#verbose = get(g:, 'case_master_varbose', v:true)
 
 let s:case_snake = 1
 let s:case_kebab = 2
 let s:case_camel = 3
 let s:case_pascal = 4
-
 let s:case_first = s:case_snake
 let s:case_last = s:case_pascal
-
 let s:case_names = {}
 let s:case_names[s:case_snake] = 'snake_case'
 let s:case_names[s:case_kebab] = 'kebab-case'
@@ -22,7 +20,9 @@ let s:case_names[s:case_camel] = 'camelCase'
 let s:case_names[s:case_pascal] = 'PascalCase'
 
 function! case_master#log(message) abort
-  echom '[CaseMaster] ' . a:message
+  if g:case_master#verbose
+    echo '[CaseMaster] ' . a:message
+  endif
 endfunction
 
 function! case_master#detect_case(chunk) abort
@@ -33,6 +33,10 @@ function! case_master#detect_case(chunk) abort
     return s:case_snake
   endif
   return a:chunk[0] =~# '\u' ?  s:case_pascal : s:case_camel
+endfunction
+
+function! case_master#get_case(chunk) abort
+  return s:case_names[case_master#detect_case(a:chunk)]
 endfunction
 
 function! case_master#split(chunk) abort
