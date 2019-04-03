@@ -1,4 +1,4 @@
-## vim-case-master
+# vim-case-master
 
 `vim-case-master` provides functions to convert your cases.
 
@@ -48,14 +48,14 @@ Vim is a highly_configurable_text_editor for efficiently
 ## Options
 
 ```vim
-let g:case_master_varbose = 0   " Suppress logs when converting
+let g:case_master_verbose = 0   " Suppress logs when converting
 ```
 
 ## Commands
 
 | Command | Description |
 |:---|---|
-| `:CaseMasterRotateCase` | Rotate case `snake_case` -> `kebab-case` → `camelCase` -> `PascalCase` -> `snake_case` |
+| `:CaseMasterRotateCase` | Rotate case `snake_case` → `kebab-case` → `camelCase` → `PascalCase` → `snake_case` |
 | `:CaseMasterConvertToSnake` | Convert into `snake_case` |
 | `:CaseMasterConvertToKebab` | Convert into `kebab-case` |
 | `:CaseMasterConvertToCamel` | Convert into `camelCase` |
