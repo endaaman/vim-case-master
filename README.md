@@ -1,6 +1,6 @@
 # vim-case-master
 
-`vim-case-master` provides functions to convert your cases.
+`vim-case-master` provides commands to convert case of words.
 
 ## Installation
 
@@ -48,7 +48,8 @@ Vim is a highly_configurable_text_editor for efficiently
 ## Options
 
 ```vim
-let g:case_master_verbose = 0   " Suppress logs when converting
+" Suppress logs when converting
+let g:case_master_verbose = 0   " Default: v:true
 ```
 
 ## Commands
