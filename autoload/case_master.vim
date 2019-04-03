@@ -5,7 +5,8 @@ if !exists('g:loaded_case_master')
 endif
 let g:loaded_case_master = 1
 
-let g:case_master#verbose = get(g:, 'case_master_varbose', v:true)
+let g:case_master#verbose = get(g:, 'case_master_verbose', v:true)
+let g:case_master#splitter = get(g:, 'case_master_splitter', '[^a-zA-Z0-9-_]')
 
 let s:case_snake = 1
 let s:case_kebab = 2
@@ -55,10 +56,10 @@ endfunction
 function! case_master#get_current_chunk_pos() abort
   let l:y = col('.')
   let l:line = getline('.')
-  if l:line[l:y - 1] ==# ' '
+  if l:line[l:y - 1] =~# g:case_master#splitter
     return [l:y - 1, l:y]
   endif
-  let splitted = split(l:line, '[^a-zA-Z0-9-_]', v:true)
+  let splitted = split(l:line, g:case_master#splitter, v:true)
   let l:end = 1
   for l:w in splitted
     let l:start = l:end - 1
@@ -128,12 +129,11 @@ endfunction
 
 function! case_master#convert(case) abort
   let l:pos = case_master#get_current_chunk_pos()
-  let l:line = getline('.')
-  let l:chunk = strpart(l:line, l:pos[0], l:pos[1] - l:pos[0])
-  if l:chunk ==# ' '
-    call case_master#log('blank')
+  if l:pos[1] - l:pos[0] < 2
     return
   endif
+  let l:line = getline('.')
+  let l:chunk = strpart(l:line, l:pos[0], l:pos[1] - l:pos[0])
   if a:case == 0
     let l:replacer = case_master#to_next_case(l:chunk)
   else
