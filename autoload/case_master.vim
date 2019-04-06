@@ -58,7 +58,7 @@ function! s:get_chunk_pos() abort
     return [l:x - 1, l:x]
   endif
   let l:start = l:x - 1
-  while l:start > 1
+  while l:start > 0
     if l:line[l:start - 1] =~# g:case_master#splitter
       break
     endif
