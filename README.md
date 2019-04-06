@@ -49,7 +49,7 @@ Vim is a highly_configurable_text_editor for efficiently
 
 ```vim
 " Suppress logs when converting
-let g:case_master_verbose = 0   " Default: v:true
+let g:case_master_verbose = 0   " Default: 1
 ```
 
 ## Commands

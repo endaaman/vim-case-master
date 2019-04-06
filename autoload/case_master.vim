@@ -5,7 +5,7 @@ if !exists('g:loaded_case_master')
 endif
 let g:loaded_case_master = 1
 
-let g:case_master#verbose = get(g:, 'case_master_verbose', v:true)
+let g:case_master#verbose = get(g:, 'case_master_verbose', 1)
 let g:case_master#splitter = get(g:, 'case_master_splitter', '[^a-zA-Z0-9-_]')
 
 let s:case_snake = 'snake'
@@ -84,7 +84,7 @@ endfunction
 
 function! s:convert_capival(chunk, camel) abort
   let l:words = s:split_by_case(a:chunk)
-  let l:first = v:true
+  let l:first = 1
   let l:ret = ''
   for l:word in l:words
     if a:camel && l:first
@@ -98,7 +98,7 @@ function! s:convert_capival(chunk, camel) abort
 endfunction
 
 function! s:converters[s:case_camel](chunk) abort
-  return s:convert_capival(a:chunk, v:true)
+  return s:convert_capival(a:chunk, 1)
 endfunction
 
 function! s:converters[s:case_pascal](chunk) abort
