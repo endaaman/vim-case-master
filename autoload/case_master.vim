@@ -12,13 +12,15 @@ let s:case_snake = 'snake'
 let s:case_kebab = 'kebab'
 let s:case_camel = 'camel'
 let s:case_pascal = 'pascal'
-let s:case_orders = [s:case_snake, s:case_kebab, s:case_camel, s:case_pascal]
+let s:case_macro = 'macro'
+let s:case_orders = [s:case_snake, s:case_kebab, s:case_camel, s:case_pascal, s:case_macro]
 
 let s:labels = {}
 let s:labels[s:case_snake] = 'snake_case'
 let s:labels[s:case_kebab] = 'kebab-case'
 let s:labels[s:case_camel] = 'camelCase'
 let s:labels[s:case_pascal] = 'PascalCase'
+let s:labels[s:case_macro] = 'MACRO_CASE'
 
 let s:converters = {}
 
@@ -33,22 +35,31 @@ function! s:detect_case(chunk) abort
     return s:case_kebab
   endif
   if !empty(matchstr(a:chunk, '_'))
+    if a:chunk =~# '^[A-Z_]*$'
+      return s:case_macro
+    endif
     return s:case_snake
   endif
   return a:chunk[0] =~# '\u' ?  s:case_pascal : s:case_camel
 endfunction
 
-function! s:split_by_case(chunk) abort
-  let l:a = split(a:chunk, '\u\@=')
-  let l:b = []
-  for l:w in l:a
-    let l:b += split(l:w, '_')
+function! s:universal_split(chunk) abort
+  let l:tmp1 = split(a:chunk, '_')
+
+  let l:tmp2 = []
+  for l:v in l:tmp1
+    let l:tmp2 += split(l:v, '-')
   endfor
-  let l:c = []
-  for l:w in l:b
-    let l:c += split(l:w, '-')
+
+  let l:tmp3 = []
+  for l:v in l:tmp2
+    if l:v =~# '^[^a-z]*$'
+      call add(l:tmp3, l:v)
+      continue
+    endif
+    let l:tmp3 += split(l:v, '\u\@=')
   endfor
-  return l:c
+  return l:tmp3
 endfunction
 
 function! s:get_chunk_pos() abort
@@ -75,34 +86,38 @@ function! s:get_chunk_pos() abort
 endfunction
 
 function! s:converters[s:case_snake](chunk) abort
-  return tolower(join(s:split_by_case(a:chunk), '_'))
+  return tolower(join(s:universal_split(a:chunk), '_'))
+endfunction
+
+function! s:converters[s:case_macro](chunk) abort
+  return toupper(join(s:universal_split(a:chunk), '_'))
 endfunction
 
 function! s:converters[s:case_kebab](chunk) abort
-  return tolower(join(s:split_by_case(a:chunk), '-'))
+  return tolower(join(s:universal_split(a:chunk), '-'))
 endfunction
 
-function! s:convert_capival(chunk, camel) abort
-  let l:words = s:split_by_case(a:chunk)
+function! s:convert_to_camel(chunk, first_upper) abort
+  let l:words = s:universal_split(a:chunk)
   let l:first = 1
   let l:ret = ''
   for l:word in l:words
-    if a:camel && l:first
+    if l:first && !a:first_upper
       let l:ret .= tolower(l:word)
     else
       let l:ret .= toupper(l:word[0]) . tolower(l:word[1:])
     endif
-    let l:first = v:false
+    let l:first = 0
   endfor
   return l:ret
 endfunction
 
 function! s:converters[s:case_camel](chunk) abort
-  return s:convert_capival(a:chunk, 1)
+  return s:convert_to_camel(a:chunk, 0)
 endfunction
 
 function! s:converters[s:case_pascal](chunk) abort
-  return s:convert_capival(a:chunk, v:false)
+  return s:convert_to_camel(a:chunk, 1)
 endfunction
 
 function! s:get_next_case(current) abort

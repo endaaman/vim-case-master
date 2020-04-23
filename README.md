@@ -13,37 +13,47 @@ Plug 'endaaman/vim-case-master'
 ## Usage
 
 ```
-Vim is a highly_configurable_text_editor for efficiently
-                                      ^
+hoge_fuga_piyo
+            ^
 ```
 
-If you exec `:CaseMasterRotateCase` when your caret is on the `^`, the text will converted as below.
+Executing `:CaseMasterRotateCase`, the text will converted as below (`^` shows your caret position).
 
 ```
-Vim is a highly-configurable-text-editor for efficiently
-                                      ^
+hoge-fuga-piyo
+            ^
 ```
 
-If you continue to execute `:CaseMasterRotateCase`
+You got `kebab-case`. If you execute `:CaseMasterRotateCase` again then
 
 ```
-Vim is a highlyConfigurableTextEditor for efficiently
-                                    ^
+hogeFugaPiyo
+           ^
 ```
 
-If you execute further
+You got `camelCase`. And if you execute `:CaseMasterRotateCase` again then
 
 ```
-Vim is a HighlyConfigurableTextEditor for efficiently
-                                    ^
+HogeFugaPiyo
+           ^
 ```
 
-And more
+You got `PascalCase`. And do again,
 
 ```
-Vim is a highly_configurable_text_editor for efficiently
-                                    ^
+HOGE_FUGA_PIYO
+           ^
 ```
+
+You got `MACRO_CASE`. And do more again,
+
+```
+hoge_fuga_piyo
+           ^
+```
+
+You are back to snake_case.
+
 
 ## Options
 
@@ -56,8 +66,9 @@ let g:case_master_verbose = 0   " Default: 1
 
 | Command | Description |
 |:---|---|
-| `:CaseMasterRotateCase` | Rotate case `snake_case` → `kebab-case` → `camelCase` → `PascalCase` → `snake_case` |
+| `:CaseMasterRotateCase` | Rotate case `snake_case` → `kebab-case` → `camelCase` → `PascalCase` → `MACRO_CASE` → … |
 | `:CaseMasterConvertToSnake` | Convert into `snake_case` |
 | `:CaseMasterConvertToKebab` | Convert into `kebab-case` |
 | `:CaseMasterConvertToCamel` | Convert into `camelCase` |
 | `:CaseMasterConvertToPascal` | Convert into `PascalCase` |
+| `:CaseMasterConvertToMacro` | Convert into `MACRO_CASE` |
