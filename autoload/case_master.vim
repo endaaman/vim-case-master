@@ -24,11 +24,6 @@ let s:labels[s:case_macro] = 'MACRO_CASE'
 
 let s:converters = {}
 
-function! s:log(message) abort
-  if g:case_master#verbose
-    echo '[CaseMaster] ' . a:message
-  endif
-endfunction
 
 function! s:detect_case(chunk) abort
   if !empty(matchstr(a:chunk, '-'))
@@ -40,7 +35,13 @@ function! s:detect_case(chunk) abort
     endif
     return s:case_snake
   endif
-  return a:chunk[0] =~# '\u' ?  s:case_pascal : s:case_camel
+  if a:chunk =~# '^[A-Z]*$'
+    return s:case_macro
+  endif
+  if a:chunk[0] =~# '\u'
+    return s:case_pascal
+  endif
+  return s:case_camel
 endfunction
 
 function! s:universal_split(chunk) abort
@@ -143,7 +144,6 @@ function! case_master#convert(case) abort
     let l:case = a:case
   endif
   let l:replacer = s:converters[l:case](l:chunk)
-  call s:log(s:labels[l:current_case] . ' -> ' . s:labels[l:case])
   let l:pre = strpart(l:line, 0, l:pos[0])
   let l:post = strpart(l:line, l:pos[1], len(l:line))
   let l:end = l:pos[0] + len(l:replacer)
@@ -151,4 +151,8 @@ function! case_master#convert(case) abort
     call cursor(line('.'), l:end)
   endif
   call setline('.', l:pre . l:replacer . l:post)
+
+  if g:case_master#verbose
+    echo '[CaseMaster] ' . s:labels[l:current_case] . ' -> ' . s:labels[l:case]
+  endif
 endfunction
