@@ -72,3 +72,11 @@ let g:case_master_verbose = 0   " Default: 1
 | `:CaseMasterConvertToCamel` | Convert into `camelCase` |
 | `:CaseMasterConvertToPascal` | Convert into `PascalCase` |
 | `:CaseMasterConvertToMacro` | Convert into `MACRO_CASE` |
+| `:CaseMasterRoateVisual` | Rotate case when visual mode. |
+
+## Example
+
+```vim
+nnoremap <silent> <C-e> :<C-u>CaseMasterRotateCase<CR>
+vnoremap <silent> <C-e> :<C-u>CaseMasterRotateCaseVisual<CR>
+```

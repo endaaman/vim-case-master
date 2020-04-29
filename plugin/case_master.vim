@@ -11,3 +11,5 @@ command! CaseMasterConvertToKebab :call case_master#convert('kebab')
 command! CaseMasterConvertToCamel :call case_master#convert('camel')
 command! CaseMasterConvertToPascal :call case_master#convert('pascal')
 command! CaseMasterConvertToMacro :call case_master#convert('macro')
+
+command! CaseMasterRotateCaseVisual :call case_master#convert_visual(0)

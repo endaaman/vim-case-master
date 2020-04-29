@@ -25,6 +25,12 @@ let s:labels[s:case_macro] = 'MACRO_CASE'
 let s:converters = {}
 
 
+function! s:log(message) abort
+  if g:case_master#verbose
+    echo '[CaseMaster] ' . a:message
+  endif
+endfunction
+
 function! s:detect_case(chunk) abort
   if !empty(matchstr(a:chunk, '-'))
     return s:case_kebab
@@ -63,9 +69,9 @@ function! s:universal_split(chunk) abort
   return l:tmp3
 endfunction
 
-function! s:get_chunk_pos() abort
-  let l:x = col('.')
-  let l:line = getline('.')
+function! s:get_chunk_pos(line, cursor_position) abort
+  let l:x = a:cursor_position
+  let l:line = a:line
   if l:line[l:x - 1] =~# g:case_master#splitter
     return [l:x - 1, l:x]
   endif
@@ -131,12 +137,13 @@ function! s:get_next_case(current) abort
 endfunction
 
 function! case_master#convert(case) abort
-  let l:pos = s:get_chunk_pos()
+  let l:line = getline('.')
+  let l:pos = s:get_chunk_pos(l:line, col('.'))
   if l:pos[1] - l:pos[0] < 2
     return
   endif
-  let l:line = getline('.')
   let l:chunk = strpart(l:line, l:pos[0], l:pos[1] - l:pos[0])
+
   let l:current_case = s:detect_case(l:chunk)
   if empty(a:case) && match(s:case_orders, a:case)
     let l:case = s:get_next_case(l:current_case)
@@ -144,6 +151,7 @@ function! case_master#convert(case) abort
     let l:case = a:case
   endif
   let l:replacer = s:converters[l:case](l:chunk)
+
   let l:pre = strpart(l:line, 0, l:pos[0])
   let l:post = strpart(l:line, l:pos[1], len(l:line))
   let l:end = l:pos[0] + len(l:replacer)
@@ -152,7 +160,49 @@ function! case_master#convert(case) abort
   endif
   call setline('.', l:pre . l:replacer . l:post)
 
-  if g:case_master#verbose
-    echo '[CaseMaster] ' . s:labels[l:current_case] . ' -> ' . s:labels[l:case]
+  call s:log(s:labels[l:current_case] . ' -> ' . s:labels[l:case])
+endfunction
+
+function! case_master#convert_visual(case) abort
+  if visualmode() != 'v'
+    return
   endif
+  let [l:row_start, l:start] = getpos("'<")[1:2]
+  let [l:row_end, l:end] = getpos("'>")[1:2]
+  let l:lines = getline(row_start, row_end)
+  if l:row_start != l:row_end
+    call s:log('The selection contains multiple lines.')
+    normal! gv
+    return
+  endif
+  if len(l:lines) != 1
+    call s:log('The selection is empty.')
+    return
+  endif
+  let l:row = l:row_start
+  let l:line = l:lines[0]
+  let l:chunk = strpart(l:line, l:start - 1, l:end - l:start + 1)
+  if l:chunk =~# g:case_master#splitter
+    call s:log('The selection contains multiple word-chunks.')
+    normal! gv
+    return
+  endif
+
+  let l:current_case = s:detect_case(l:chunk)
+  if empty(a:case) && match(s:case_orders, a:case)
+    let l:case = s:get_next_case(l:current_case)
+  else
+    let l:case = a:case
+  endif
+  let l:replacer = s:converters[l:case](l:chunk)
+
+  let l:pre = strpart(l:line, 0, l:start - 1)
+  let l:post = strpart(l:line, l:end, len(l:line))
+  call setline(l:row, l:pre . l:replacer . l:post)
+
+  " restore selection
+  call setpos('.', [0, l:row, l:start])
+  normal! v
+  call setpos('.', [0, l:row, l:start + len(l:replacer) - 1])
+  call s:log(s:labels[l:current_case] . ' -> ' . s:labels[l:case])
 endfunction
